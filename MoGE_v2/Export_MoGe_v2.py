@@ -7,10 +7,10 @@ import onnxruntime
 import matplotlib.pyplot as plt
 
 
-project_path = '/home/iamj/Downloads/MoGe-main'
-model_path = '/home/iamj/Downloads/moge-2-vits-normal/model.pt'
-onnx_model_A = '/home/iamj/Downloads/MoGe_ONNX/MoGe_v2.onnx'
-test_image_path = 'test.jpg'
+project_path = '/home/DakeQQ/Downloads/MoGe-main'                     # The project folder path. https://github.com/microsoft/MoGe
+model_path = '/home/DakeQQ/Downloads/moge-2-vits-normal/model.pt'     # The target depth model. Only support the v2 series.
+onnx_model_A = '/home/DakeQQ/Downloads/MoGe_ONNX/MoGe_v2.onnx'        # The exported onnx model path.
+test_image_path = 'test.jpg'                                          # The test input after the export process.
 
 
 INPUT_IMAGE_SIZE = [720, 1280]          # Input image shape [Heigh, Width]. Should be a multiple of GPU group (e.g., 16) for optimal efficiency.
