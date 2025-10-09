@@ -13,7 +13,7 @@ onnx_model_A = '/home/DakeQQ/Downloads/MoGe_ONNX/MoGe_v2.onnx'        # The expo
 test_image_path = './test.jpg'                                        # The test input after the export process.
 
 
-INPUT_IMAGE_SIZE = [720, 1280]          # Input image shape [Heigh, Width]. Should be a multiple of GPU group (e.g., 16) for optimal efficiency.
+INPUT_IMAGE_SIZE = [720, 1280]          # Input image shape [Height, Width]. Should be a multiple of GPU group (e.g., 16) for optimal efficiency.
 NUM_TOKENS = 3600                       # Larger is finer but slower.
 FOCAL = None                            # Set None for auto else fixed. FOCAL here is the focal length relative to half the image diagonal.
 EDGE_DETECTION = False                  # True for convert the depth map into edge map.
