@@ -11,3 +11,15 @@
 |:------------:|:------------:|:-----------------:|:------------:|:------------------------------------------------:|
 | Ubuntu-24.04 | Desktop      | CPU <br> i7-1165G7 | MoGe-v2-vits <br> f32 | 3.4                                    |
 | Ubuntu-24.04 | Desktop      | GPU <br> MX150 | MoGe-v2-vits <br> f32 | 1.5                                        |
+
+
+---
+
+###  MoGe-v2-vits
+<br>
+<img width="1352" height="676" alt="Screenshot from 2025-10-09 17-53-09" src="https://github.com/user-attachments/assets/895f5821-bc75-4c81-919d-682ec05e4503" />
+
+<br>
+<img width="1352" height="676" alt="Screenshot from 2025-10-09 17-52-22" src="https://github.com/user-attachments/assets/19169c4c-fa7b-49fa-bf91-119aae2ae0f8" />
+
+---
