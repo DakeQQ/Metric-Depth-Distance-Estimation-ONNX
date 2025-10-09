@@ -10,12 +10,13 @@ import matplotlib.pyplot as plt
 project_path = '/home/DakeQQ/Downloads/MoGe-main'                     # The project folder path. https://github.com/microsoft/MoGe
 model_path = '/home/DakeQQ/Downloads/moge-2-vits-normal/model.pt'     # The target depth model. Only support the v2 series.
 onnx_model_A = '/home/DakeQQ/Downloads/MoGe_ONNX/MoGe_v2.onnx'        # The exported onnx model path.
-test_image_path = 'test.jpg'                                          # The test input after the export process.
+test_image_path = './test.jpg'                                        # The test input after the export process.
 
 
-INPUT_IMAGE_SIZE = [720, 1280]          # Input image shape [Height, Width]. Should be a multiple of GPU group (e.g., 16) for optimal efficiency.
+INPUT_IMAGE_SIZE = [720, 1280]          # Input image shape [Heigh, Width]. Should be a multiple of GPU group (e.g., 16) for optimal efficiency.
 NUM_TOKENS = 3600                       # 1200 ~ 3600, larger is finer but slower.
 FOCAL = None                            # Set None for auto else fixed. FOCAL here is the focal length relative to half the image diagonal.
+EDGE_DETECTION = False                  # True for convert the depth map into edge map.
 
 """
 fov_x: The horizontal camera FoV in degrees. Smartphone ultra-wide: ~110-120°
@@ -153,6 +154,9 @@ class MoGeV2(torch.nn.Module):
         )
         self.save_uv.append(uv_lr.permute(0, 2, 3, 1).reshape(-1, 2))
 
+        self.sobel_x = torch.tensor([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=torch.float32).view(1, 1, 3, 3)
+        self.sobel_y = torch.tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=torch.float32).view(1, 1, 3, 3)
+
     def recover_focal_shift(self, points, focal=None, downsample_size=(64, 64)):
         points_lr = torch.nn.functional.interpolate(
             points.permute(0, 3, 1, 2),
@@ -229,6 +233,14 @@ class MoGeV2(torch.nn.Module):
             antialias=False
         )
 
+        if EDGE_DETECTION:
+            dx = torch.nn.functional.conv2d(depth, self.sobel_x, padding=1)
+            dy = torch.nn.functional.conv2d(depth, self.sobel_y, padding=1)
+            gradient_map = torch.pow(dx ** 2 + dy ** 2, 0.4)  # Use 0.4 for amplify the small gradient values.
+            min_val, max_val = torch.aminmax(gradient_map)    
+            gradient_map = (gradient_map - min_val) / (max_val - min_val)  # Normalize to 0 ~ 1
+            return gradient_map
+
         return depth
 
 
@@ -251,7 +263,7 @@ with torch.inference_mode():
             in_feed,
             onnx_model_A,
             input_names=input_names,
-            output_names=['depth_in_meters'],
+            output_names=['gradient_map'] if EDGE_DETECTION else ['depth_in_meters'],
             do_constant_folding=True,
             opset_version=17
         )
@@ -262,7 +274,7 @@ with torch.inference_mode():
 
     if project_path in sys.path:
         sys.path.remove(project_path)
-            
+
     print('\nExport Done.')
 
 
@@ -358,9 +370,9 @@ plt.axis('off')
 plt.subplot(1, 2, 2)
 # imshow can directly handle the floating-point depth array.
 plt.imshow(depth_map_onnx, cmap='turbo')
-plt.title('Depth Heatmap (from ONNX model)')
+plt.title('Edge Heatmap (from ONNX model)' if EDGE_DETECTION else 'Depth Heatmap (from ONNX model)')
 # Add a color bar to show the mapping of colors to depth values.
-plt.colorbar(label='Depth Metric')
+plt.colorbar(label='Normalized Gradient' if EDGE_DETECTION else 'Depth Metric')
 plt.axis('off')
 
 # Adjust layout and display the plot
