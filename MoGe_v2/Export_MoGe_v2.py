@@ -14,7 +14,7 @@ test_image_path = './test.jpg'                                        # The test
 
 
 INPUT_IMAGE_SIZE = [720, 1280]          # Input image shape [Heigh, Width]. Should be a multiple of GPU group (e.g., 16) for optimal efficiency.
-NUM_TOKENS = 3600                       # 1200 ~ 3600, larger is finer but slower.
+NUM_TOKENS = 3600                       # Larger is finer but slower.
 FOCAL = None                            # Set None for auto else fixed. FOCAL here is the focal length relative to half the image diagonal.
 EDGE_DETECTION = False                  # True for convert the depth map into edge map.
 
