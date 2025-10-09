@@ -96,7 +96,7 @@ rgb_img = cv2.cvtColor(raw_img, cv2.COLOR_BGR2RGB)
 
 # Resize the image to the exact size the model expects.
 # cv2.resize expects (width, height).
-resized_img = cv2.resize(rgb_img, (input_width, input_height))
+resized_img = cv2.resize(rgb_img, (ort_session._inputs_meta[0].shape[-1], ort_session._inputs_meta[0].shape[-2]))
 
 # The model's ONNX graph expects a uint8 tensor with the shape (N, C, H, W).
 # 1. Add a batch dimension: (H, W, C) -> (1, H, W, C)
@@ -107,10 +107,12 @@ print(f"Input tensor prepared with shape: {input_tensor.shape} and dtype: {input
 
 # --- Run Inference ---
 input_name = ort_session.get_inputs()[0].name
-output_name = ort_session.get_outputs()[0].name
+output_name = [ort_session.get_outputs()[0].name]
 
 print(f"Running inference on ONNX model...")
-onnx_result = ort_session.run([output_name], {input_name: input_tensor})
+start = time.time()
+onnx_result = ort_session.run(output_name, {input_name: input_tensor})
+print(f'\nTime cost: {time.time() - start:.3f} seconds')
 
 # The output is a list containing one array. We extract the array.
 depth_map_onnx = onnx_result[0]
@@ -150,3 +152,4 @@ plt.tight_layout()
 plt.show()
 
 print("✅ Visualization complete.")
+
