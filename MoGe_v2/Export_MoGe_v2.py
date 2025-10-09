@@ -259,6 +259,10 @@ with torch.inference_mode():
     del in_feed
     del input_names
     del image
+
+    if project_path in sys.path:
+        sys.path.remove(project_path)
+            
     print('\nExport Done.')
 
 
